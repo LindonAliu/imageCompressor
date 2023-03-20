@@ -18,3 +18,7 @@ closest :: [(Int, Int, Int)] -> (Int, Int, Int) -> (Int, Int, Int)
 closest [] _ = (0, 0, 0)
 closest (x:xs) y =
     foldl (\acc x -> if distance x y < distance acc y then x else acc) x xs
+
+initColors :: Int -> [(Int, Int, Int)]
+initColors 0 = []
+initColors n = (0, 0, 0) : initColors (n - 1)
