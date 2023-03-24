@@ -6,8 +6,5 @@
 -}
 
 module Algorithm
-    ( imageCompressor
+    (
     ) where
-
-imageCompressor:: IO ()
-imageCompressor = putStrLn "imageCompressor"

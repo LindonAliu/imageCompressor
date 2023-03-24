@@ -9,7 +9,7 @@ module Main
     ( main
     ) where
 
-import Algorithm
+import Lib
 
 main :: IO ()
 main = imageCompressor
