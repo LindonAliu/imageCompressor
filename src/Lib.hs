@@ -12,8 +12,8 @@ module Lib
     ) where
 
 import Args
+import Error (errorMessage)
 import Options.Applicative
-import System.Exit
 
 type Color = (Int, Int, Int)
 type Position = (Int, Int)
@@ -26,11 +26,10 @@ imageCompressor = checkArguments =<< execParser opts
             <> header "ImageCompressor" )) { infoFailureCode = 84 }
 
 checkArguments :: Sample -> IO ()
-checkArguments (Sample c l _) | c < 1 =
+checkArguments (Sample c l f) | c < 1 =
     errorMessage "Invalid number of colors"
                               | l <= 0 =
     errorMessage "Invalid convergence limit"
-                              | otherwise = putStrLn "GOOD JOB"
-
-errorMessage :: String -> IO ()
-errorMessage s = putStrLn s >> exitWith (ExitFailure 84)
+                              | otherwise = do
+    content <- getFileContent f
+    putStrLn content

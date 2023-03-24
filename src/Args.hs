@@ -7,9 +7,12 @@
 
 module Args
     ( Sample (..)
+    , getFileContent
     , getSample
     ) where
 
+import Control.Exception (catch, IOException)
+import Error (errorMessage)
 import Options.Applicative
 
 data Sample = Sample {
@@ -26,3 +29,13 @@ getSample = Sample
     ( short 'l' <> metavar "L" <> help "Convergence limit" )
     <*> strOption ( short 'f' <> metavar "F"
     <> help "Path to the file containing the colors of the pixels" )
+
+getFileContent :: FilePath -> IO String
+getFileContent filename = do
+    content <- catch (Just <$> readFile filename) fileHandler
+    case content of
+        Nothing -> errorMessage("Error: file " ++ filename ++ " not found") >> return ""
+        Just c -> return c
+
+fileHandler :: IOException -> IO (Maybe String)
+fileHandler _ = return Nothing
