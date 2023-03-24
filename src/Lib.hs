@@ -1,17 +1,21 @@
 {-
--- EPITECH PROJECT, 2022
--- ImageCompressor
+-- EPITECH PROJECT, 2023
+-- Lib
 -- File description:
--- Core
+-- Lib of project
 -}
 
-module Lib (
-    imageCompressor
-) where
+module Lib
+    ( Color
+    , Position
+    ) where
 
 import Args
 import Options.Applicative
 import System.Exit
+
+type Color = (Int, Int, Int)
+type Position = (Int, Int)
 
 imageCompressor :: IO ()
 imageCompressor = checkArguments =<< execParser opts

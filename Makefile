@@ -5,8 +5,9 @@
 ## Makefile
 ##
 
-SRC		=	app/Main.hs \
-			src/Lib.hs
+SRC		=	app/Main.hs 		\
+			src/Lib.hs			\
+			src/Algorithm.hs
 
 NAME	=	imageCompressor
 
