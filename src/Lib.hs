@@ -1,13 +1,14 @@
 {-
--- EPITECH PROJECT, 2022
--- ImageCompressor
+-- EPITECH PROJECT, 2023
+-- Lib
 -- File description:
--- Core
+-- Lib of project
 -}
 
-module Lib (
-    imageCompressor
-) where
+module Lib
+    ( Color
+    , Position
+    ) where
 
-imageCompressor :: IO ()
-imageCompressor = putStrLn "imageCompressor"
+type Color = (Int, Int, Int)
+type Position = (Int, Int)

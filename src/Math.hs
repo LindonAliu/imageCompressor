@@ -1,24 +1,28 @@
 {-
--- EPITECH PROJECT, 2022
--- ImageCompressor
+-- EPITECH PROJECT, 2023
+-- Math
 -- File description:
--- Math utils
+-- All math functions
 -}
 
-module Math (
-    closest,
-    distance
-) where
+module Math
+    ( closest
+    , distance
+    ) where
 
-distance :: (Int, Int, Int) -> (Int, Int, Int) -> Float
+import Lib
+
+distance :: Color -> Color -> Float
 distance (x1, y1, z1) (x2, y2, z2) =
-    sqrt (fromIntegral ((x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2 - z1) ^ 2))
+    sqrt (fromIntegral (((x2 - x1) ^ (2::Int)) +
+                        ((y2 - y1) ^ (2::Int)) +
+                        ((z2 - z1) ^ (2::Int))))
 
-closest :: [(Int, Int, Int)] -> (Int, Int, Int) -> (Int, Int, Int)
+closest :: [Color] -> Color -> Color
 closest [] _ = (0, 0, 0)
 closest (x:xs) y =
-    foldl (\acc x -> if distance x y < distance acc y then x else acc) x xs
+    foldl (\acc f -> if distance f y < distance acc y then f else acc) x xs
 
-initColors :: Int -> [(Int, Int, Int)]
-initColors 0 = []
-initColors n = (0, 0, 0) : initColors (n - 1)
+-- initColors :: Int -> [Color]
+-- initColors 0 = []
+-- initColors n = (0, 0, 0) : initColors (n - 1)
