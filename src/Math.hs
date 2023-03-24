@@ -11,6 +11,7 @@ module Math
     ) where
 
 import Lib
+import System.Random
 
 distance :: Color -> Color -> Float
 distance (x1, y1, z1) (x2, y2, z2) =
@@ -23,6 +24,9 @@ closest [] _ = (0, 0, 0)
 closest (x:xs) y =
     foldl (\acc f -> if distance f y < distance acc y then f else acc) x xs
 
--- initColors :: Int -> [Color]
--- initColors 0 = []
--- initColors n = (0, 0, 0) : initColors (n - 1)
+getRandomColorInList :: [Color] -> Color
+getRandomColorInList [] = (0, 0, 0)
+getRandomColorInList list = list !! (randomInt (0, length list - 1) (mkStdGen 42))
+
+randomInt :: (Int, Int) -> StdGen -> Int
+randomInt range gen = head $ randomRs range gen
