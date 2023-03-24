@@ -5,10 +5,10 @@
 -- Arguments
 -}
 
-module Args (
-    Sample (..),
-    getSample
-) where
+module Args
+    ( Sample (..)
+    , getSample
+    ) where
 
 import Options.Applicative
 

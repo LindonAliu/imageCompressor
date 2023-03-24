@@ -7,6 +7,7 @@
 
 module Lib
     ( Color
+    , imageCompressor
     , Position
     ) where
 
