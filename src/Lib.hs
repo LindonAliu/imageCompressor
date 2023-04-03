@@ -12,6 +12,7 @@ module Lib
     ) where
 
 import Args
+import Algorithm (parseFile)
 import Error (errorMessage)
 import Options.Applicative
 
@@ -32,4 +33,7 @@ checkArguments (Sample c l f) | c < 1 =
     errorMessage "Invalid convergence limit"
                               | otherwise = do
     content <- getFileContent f
-    putStrLn content
+    let pixels = parseFile (lines content)
+    if length pixels == 0 || not (snd pixels)
+        then errorMessage "Invalid file"
+        else putStrLn "File successfully parsed"

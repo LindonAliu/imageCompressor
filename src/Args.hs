@@ -34,7 +34,8 @@ getFileContent :: FilePath -> IO String
 getFileContent filename = do
     content <- catch (Just <$> readFile filename) fileHandler
     case content of
-        Nothing -> errorMessage("Error: file " ++ filename ++ " not found") >> return ""
+        Nothing -> errorMessage("Error: file " ++ filename ++ " not found")
+         >> return ""
         Just c -> return c
 
 fileHandler :: IOException -> IO (Maybe String)
