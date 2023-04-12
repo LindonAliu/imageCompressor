@@ -8,6 +8,7 @@
 module Algorithm
     ( parseFile
     , Pixel (..)
+    , algorithm
     ) where
 
 -- import Math (getRandomColorInList)
@@ -42,12 +43,10 @@ module Algorithm
 
 -- imageCompressor:: IO ()
 -- imageCompressor = getStdGen >>= \gen -> print $ getRandomColorInList (getListInFile "test") gen
-import Data.Maybe
 
-data Pixel = Pixel {
-    pos :: (Int, Int),
-    color :: (Int, Int, Int)
-}
+import Data.Maybe
+import System.Random
+import Math (getRandomPixel, Pixel (..))
 
 parseFile :: [String] -> ([Pixel], Bool)
 parseFile [] = ([], True)
@@ -58,3 +57,10 @@ parseFile (x:xs) | isJust pixel = (fromJust pixel : (fst (parseFile xs)), True)
 parseLine :: [String] -> Maybe Pixel
 parseLine [xy, rgb] = Just Pixel { pos = read xy, color = read rgb }
 parseLine _ = Nothing
+
+algorithm :: [Pixel] -> Int -> Float -> IO ()
+algorithm pixels c l = do
+    gen <- getStdGen
+    let randomPixel = getRandomPixel pixels gen
+    print randomPixel
+    putStrLn "Hello World"
