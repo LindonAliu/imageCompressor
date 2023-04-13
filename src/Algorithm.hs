@@ -11,15 +11,16 @@ module Algorithm
     , algorithm
     ) where
 
-import Math (randomInt)
-
 import Data.Maybe
 import Data.List (delete)
 import System.Random (getStdRandom, randomR)
 
 import System.IO.Unsafe (unsafePerformIO)
 import Math (distanceBetweenPixels
+            , randomInt
             , Pixel (..)
+            , Color
+            , closest
             )
 
 instance Eq Pixel where
@@ -73,8 +74,12 @@ chooseInitialCenters k pixels = do
   let squaredDistances = map (^ (2::Int)) distances
   chooseInitialCentersSecond k initialCenters remainingPixels squaredDistances
 
+assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, Pixel)]
+assignPixelsToCenters pixels centers = map assignPixel pixels
+  where assignPixel pixel = (pixel, closest centers pixel)
+
 algorithm :: [Pixel] -> Int -> Float -> IO ()
 algorithm pixels k cLimit = do
     centers <- chooseInitialCenters k pixels
-    print centers
-    print cLimit
+    let newCenters = assignPixelsToCenters pixels centers
+    print newCenters
