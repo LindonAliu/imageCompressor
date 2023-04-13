@@ -11,42 +11,19 @@ module Algorithm
     , algorithm
     ) where
 
--- import Math (getRandomColorInList)
--- import Lib (Color)
--- import System.Random
-
--- getListInFile:: String -> [Color]
--- getListInFile [] = []
--- getListInFile _ = [(1, 2, 3), (4, 5, 6), (7, 8, 9), (10, 11, 12), (13,14,15),
---                     (16,17,18), (19,20,21), (22,23,24), (25,26,27),
---                     (28,29,30), (31,32,33), (34,35,36), (37,38,39),
---                     (40,41,42), (43,44,45), (46,47,48), (49,50,51),
---                     (52,53,54), (55,56,57), (58,59,60), (61,62,63),
---                     (64,65,66), (67,68,69), (70,71,72), (73,74,75),
---                     (76,77,78), (79,80,81), (82,83,84), (85,86,87),
---                     (88,89,90), (91,92,93), (94,95,96), (97,98,99),
---                     (100,101,102), (103,104,105), (106,107,108),
---                     (109,110,111), (112,113,114), (115,116,117),
---                     (118,119,120), (121,122,123), (124,125,126),
---                     (127,128,129), (130,131,132), (133,134,135),
---                     (136,137,138), (139,140,141), (142,143,144),
---                     (145,146,147), (148,149,150), (151,152,153),
---                     (154,155,156), (157,158,159), (160,161,162),
---                     (163,164,165), (166,167,168), (169,170,171),
---                     (172,173,174), (175,176,177), (178,179,180),
---                     (181,182,183), (184,185,186), (187,188,189),
---                     (190,191,192), (193,194,195), (196,197,198),
---                     (199,200,201), (202,203,204), (205,206,207),
---                     (208,209,210), (211,212,213), (214,215,216),
---                     (217,218,219), (220,221,222), (223,224,225),
---                     (226,227,228)]
-
--- imageCompressor:: IO ()
--- imageCompressor = getStdGen >>= \gen -> print $ getRandomColorInList (getListInFile "test") gen
+import Math (randomInt)
 
 import Data.Maybe
-import System.Random
-import Math (getRandomPixel, Pixel (..))
+import Data.List (delete)
+import System.Random (getStdRandom, randomR)
+
+import System.IO.Unsafe (unsafePerformIO)
+import Math (distanceBetweenPixels
+            , Pixel (..)
+            )
+
+instance Eq Pixel where
+  (Pixel pos1 color1) == (Pixel pos2 color2) = pos1 == pos2 && color1 == color2
 
 parseFile :: [String] -> ([Pixel], Bool)
 parseFile [] = ([], True)
@@ -58,9 +35,46 @@ parseLine :: [String] -> Maybe Pixel
 parseLine [xy, rgb] = Just Pixel { pos = read xy, color = read rgb }
 parseLine _ = Nothing
 
+getRandomPixelInList :: [Pixel] -> IO Pixel
+getRandomPixelInList pixels = do
+  randomIndex <- randomInt (length pixels)
+  let randomPixel = pixels !! randomIndex
+  let remainingPixels = delete randomPixel pixels
+  return randomPixel
+
+sampleFromDistribution :: [Float] -> Int
+sampleFromDistribution distribution = loop 0 (head distribution) (tail distribution)
+  where
+    loop index _ [] = index
+    loop index acc (d:ds)
+      | acc > r = index
+      | otherwise = loop (index + 1) (acc + d) ds
+      where r = unsafePerformIO (getStdRandom (randomR (0, 1)))
+
+chooseInitialCentersSecond :: Int -> [Pixel] -> [Pixel] -> [Float] -> IO [Pixel]
+chooseInitialCentersSecond k centers pixels squaredDistances
+  | length centers == k = return centers
+  | otherwise = do
+      let distribution = map (\x -> x / sum squaredDistances) squaredDistances
+      let newCenterIndex = sampleFromDistribution distribution
+      let newCenter = pixels !! newCenterIndex
+      let newCenters = centers ++ [newCenter]
+      let remainingPixels = delete newCenter pixels
+      let newDistances = map (distanceBetweenPixels newCenter) remainingPixels
+      let newSquaredDistances = map (^2) newDistances
+      chooseInitialCentersSecond k newCenters remainingPixels newSquaredDistances
+
+chooseInitialCenters :: Int -> [Pixel] -> IO [Pixel]
+chooseInitialCenters k pixels = do
+  firstCenter <- getRandomPixelInList pixels
+  let initialCenters = [firstCenter]
+  let remainingPixels = delete firstCenter pixels
+  let distances = map (distanceBetweenPixels firstCenter) remainingPixels
+  let squaredDistances = map (^ (2::Int)) distances
+  chooseInitialCentersSecond k initialCenters remainingPixels squaredDistances
+
 algorithm :: [Pixel] -> Int -> Float -> IO ()
-algorithm pixels c l = do
-    gen <- getStdGen
-    let randomPixel = getRandomPixel pixels gen
-    print randomPixel
-    putStrLn "Hello World"
+algorithm pixels k cLimit = do
+    centers <- chooseInitialCenters k pixels
+    print centers
+    print cLimit
