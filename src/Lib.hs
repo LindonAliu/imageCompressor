@@ -11,13 +11,9 @@ module Lib
     , Position
     ) where
 
-import Args
 import Algorithm (parseFile)
 import Error (errorMessage)
 import Options.Applicative
-
-type Color = (Int, Int, Int)
-type Position = (Int, Int)
 
 imageCompressor :: IO ()
 imageCompressor = checkArguments =<< execParser opts

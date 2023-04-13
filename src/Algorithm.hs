@@ -11,11 +11,7 @@ module Algorithm
     ) where
 
 import Data.Maybe
-
-data Pixel = Pixel {
-    pos :: (Int, Int),
-    color :: (Int, Int, Int)
-}
+import Types
 
 parseFile :: [String] -> ([Pixel], Bool)
 parseFile [] = ([], True)
