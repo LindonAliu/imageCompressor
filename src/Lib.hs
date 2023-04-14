@@ -12,8 +12,10 @@ module Lib
     ) where
 
 import Algorithm (parseFile)
+import Args
 import Error (errorMessage)
 import Options.Applicative
+import Types
 
 imageCompressor :: IO ()
 imageCompressor = checkArguments =<< execParser opts
