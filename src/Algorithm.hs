@@ -10,15 +10,16 @@ module Algorithm
     , algorithm
     ) where
 
-import Data.Maybe
 import Data.List (delete)
+import Data.Maybe
 import System.Random (getStdRandom, randomR)
 
-import Math (distanceBetweenPixels
+import Math ( closest
+            , distanceBetweenPixels
             , randomInt
-            , Pixel (..)
-            , closest
             )
+
+import Types
 
 parseFile :: [String] -> ([Pixel], Bool)
 parseFile [] = ([], True)

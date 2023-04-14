@@ -16,15 +16,7 @@ module Math
 
 import System.Random
 
-data Pixel = Pixel {
-    pos :: (Int, Int),
-    color :: (Int, Int, Int)
-} deriving (Show, Read)
-
-instance Eq Pixel where
-  (Pixel pos1 color1) == (Pixel pos2 color2) = pos1 == pos2 && color1 == color2
-
-type Color = (Int, Int, Int)
+import Types
 
 distance :: Color -> Color -> Float
 distance (x1, y1, z1) (x2, y2, z2) =
