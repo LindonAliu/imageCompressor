@@ -7,7 +7,6 @@
 
 module Algorithm
     ( parseFile
-    , Pixel (..)
     , algorithm
     ) where
 
@@ -15,16 +14,11 @@ import Data.Maybe
 import Data.List (delete)
 import System.Random (getStdRandom, randomR)
 
-import System.IO.Unsafe (unsafePerformIO)
 import Math (distanceBetweenPixels
             , randomInt
             , Pixel (..)
-            , Color
             , closest
             )
-
-instance Eq Pixel where
-  (Pixel pos1 color1) == (Pixel pos2 color2) = pos1 == pos2 && color1 == color2
 
 parseFile :: [String] -> ([Pixel], Bool)
 parseFile [] = ([], True)
@@ -43,27 +37,32 @@ getRandomPixelInList pixels = do
   let remainingPixels = delete randomPixel pixels
   return randomPixel
 
-sampleFromDistribution :: [Float] -> Int
-sampleFromDistribution distribution = loop 0 (head distribution) (tail distribution)
-  where
-    loop index _ [] = index
-    loop index acc (d:ds)
-      | acc > r = index
-      | otherwise = loop (index + 1) (acc + d) ds
-      where r = unsafePerformIO (getStdRandom (randomR (0, 1)))
+sampleFromDistribution :: [Float] -> IO Int
+sampleFromDistribution distribution = do
+  num <- getStdRandom (randomR (0, 1))
+  return (loopIndex num 0 (head distribution) (tail distribution))
+
+loopIndex :: Int -> Int -> Float -> [Float] -> Int
+loopIndex _ index _ [] = index
+loopIndex num index acc (d:ds)
+  | acc > (fromIntegral num) = index
+  | otherwise = loopIndex num (index + 1) (acc + d) ds
 
 chooseInitialCentersSecond :: Int -> [Pixel] -> [Pixel] -> [Float] -> IO [Pixel]
 chooseInitialCentersSecond k centers pixels squaredDistances
   | length centers == k = return centers
-  | otherwise = do
+  | otherwise = computeInitialCentersSecond k centers pixels squaredDistances
+
+computeInitialCentersSecond :: Int -> [Pixel] -> [Pixel] -> [Float] -> IO [Pixel]
+computeInitialCentersSecond k centers pixels squaredDistances = do
       let distribution = map (\x -> x / sum squaredDistances) squaredDistances
-      let newCenterIndex = sampleFromDistribution distribution
+      newCenterIndex <- sampleFromDistribution distribution
       let newCenter = pixels !! newCenterIndex
       let newCenters = centers ++ [newCenter]
-      let remainingPixels = delete newCenter pixels
-      let newDistances = map (distanceBetweenPixels newCenter) remainingPixels
-      let newSquaredDistances = map (^2) newDistances
-      chooseInitialCentersSecond k newCenters remainingPixels newSquaredDistances
+      let remaining = delete newCenter pixels
+      let newDistances = map (distanceBetweenPixels newCenter) remaining
+      let newSquaredDistances = map (^ 2) newDistances
+      chooseInitialCentersSecond k newCenters remaining newSquaredDistances
 
 chooseInitialCenters :: Int -> [Pixel] -> IO [Pixel]
 chooseInitialCenters k pixels = do
