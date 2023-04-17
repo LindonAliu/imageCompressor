@@ -12,8 +12,9 @@ module Args
     ) where
 
 import Control.Exception (catch, IOException)
-import Error (errorMessage)
 import Options.Applicative
+
+import Error (errorMessage)
 
 data Sample = Sample {
     colors :: Int,
