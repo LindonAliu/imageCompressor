@@ -74,12 +74,16 @@ chooseInitialCenters k pixels = do
   let squaredDistances = map (^ (2::Int)) distances
   chooseInitialCentersSecond k initialCenters remainingPixels squaredDistances
 
-assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, Pixel)]
-assignPixelsToCenters pixels centers = map assignPixel pixels
-  where assignPixel pixel = (pixel, closest centers pixel)
+-- assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, Pixel)]
+-- assignPixelsToCenters pixels centers = map assignPixel pixels
+--   where assignPixel pixel = (pixel, closest centers pixel)
+
+assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, [Pixel])]
+assignPixelsToCenters pixels centers = map assignCenter centers
+  where assignCenter center = (center, filter (\pixel -> closest centers pixel == center) pixels)
 
 algorithm :: [Pixel] -> Int -> Float -> IO ()
 algorithm pixels k cLimit = do
     centers <- chooseInitialCenters k pixels
-    let newCenters = assignPixelsToCenters pixels centers
-    print newCenters
+    let assignations = assignPixelsToCenters pixels centers
+    print assignations
