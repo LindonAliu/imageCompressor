@@ -18,7 +18,7 @@ import Math ( closest
             , distanceBetweenPixels
             , randomInt
             )
-
+import Output (printImage)
 import Types
 
 parseFile :: [String] -> ([Pixel], Bool)
@@ -74,16 +74,37 @@ chooseInitialCenters k pixels = do
   let squaredDistances = map (^ (2::Int)) distances
   chooseInitialCentersSecond k initialCenters remainingPixels squaredDistances
 
--- assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, Pixel)]
--- assignPixelsToCenters pixels centers = map assignPixel pixels
---   where assignPixel pixel = (pixel, closest centers pixel)
-
 assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, [Pixel])]
 assignPixelsToCenters pixels centers = map assignCenter centers
-  where assignCenter center = (center, filter (\pixel -> closest centers pixel == center) pixels)
+  where assignCenter c = (c, filter (\px -> closest centers px == c) pixels)
+
+getNewCenters :: [(Pixel, [Pixel])] -> [Pixel]
+getNewCenters assignations = map getNewCenter assignations
+  where getNewCenter (center, pixels) = center { color = averageColor pixels }
+
+highestDistance :: [Pixel] -> [Pixel] -> Float
+highestDistance [] _ = 0
+highestDistance _ [] = 0
+highestDistance (x:xs) (y:ys)
+  = max (distanceBetweenPixels x y) (highestDistance xs ys)
+
+averageColor :: [Pixel] -> Color
+averageColor pixels | size == 0 = (0, 0, 0)
+                    | otherwise = (averageR, averageG, averageB)
+  where size = length pixels
+        averageR = div (sum (map (\px -> getRGB (color px) 0) pixels)) size
+        averageG = div (sum (map (\px -> getRGB (color px) 1) pixels)) size
+        averageB = div (sum (map (\px -> getRGB (color px) 2) pixels)) size
+
+kmeansAlgorithm :: [Pixel] -> [Pixel] -> Int -> Float -> [(Pixel, [Pixel])]
+kmeansAlgorithm pixels centers k cLimit
+  | dist > cLimit = kmeansAlgorithm pixels newCenters k cLimit
+  | otherwise = assignations
+  where assignations = assignPixelsToCenters pixels centers
+        newCenters = getNewCenters assignations
+        dist = highestDistance centers newCenters
 
 algorithm :: [Pixel] -> Int -> Float -> IO ()
 algorithm pixels k cLimit = do
     centers <- chooseInitialCenters k pixels
-    let assignations = assignPixelsToCenters pixels centers
-    print assignations
+    printImage (kmeansAlgorithm pixels centers k cLimit)

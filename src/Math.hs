@@ -27,11 +27,6 @@ distance (x1, y1, z1) (x2, y2, z2) =
 distanceBetweenPixels :: Pixel -> Pixel -> Float
 distanceBetweenPixels p1 p2 = distance (color p1) (color p2)
 
--- closest :: [Color] -> Color -> Color
--- closest [] _ = (0, 0, 0)
--- closest (x:xs) y =
---     foldl (\acc f -> if distance f y < distance acc y then f else acc) x xs
-
 closest :: [Pixel] -> Pixel -> Pixel
 closest [] _ = Pixel { pos = (0, 0), color = (0, 0, 0) }
 closest (x:xs) y =
