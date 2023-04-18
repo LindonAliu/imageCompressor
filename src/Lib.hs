@@ -6,16 +6,14 @@
 -}
 
 module Lib
-    ( Color
-    , imageCompressor
-    , Position
+    ( imageCompressor
     ) where
 
-import Algorithm (parseFile)
-import Args
-import Error (errorMessage)
 import Options.Applicative
-import Types
+
+import Args
+import Algorithm (algorithm, parseFile)
+import Error (errorMessage)
 
 imageCompressor :: IO ()
 imageCompressor = checkArguments =<< execParser opts
@@ -34,4 +32,4 @@ checkArguments (Sample c l f) | c < 1 =
     let pixels = parseFile (lines content)
     if length pixels == 0 || not (snd pixels)
         then errorMessage "Invalid file"
-        else putStrLn "File successfully parsed"
+        else algorithm (fst pixels) c l

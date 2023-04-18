@@ -6,8 +6,11 @@
 ##
 
 SRC		=	app/Main.hs 		\
+			src/Algorithm.hs	\
+			src/Args.hs			\
+			src/Error.hs		\
 			src/Lib.hs			\
-			src/Algorithm.hs
+			src/Math.hs			\
 
 NAME	=	imageCompressor
 

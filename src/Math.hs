@@ -8,7 +8,13 @@
 module Math
     ( closest
     , distance
+    , distanceBetweenPixels
+    , randomInt
+    , Pixel (..)
+    , Color
     ) where
+
+import System.Random
 
 import Types
 
@@ -18,11 +24,17 @@ distance (x1, y1, z1) (x2, y2, z2) =
                         ((y2 - y1) ^ (2::Int)) +
                         ((z2 - z1) ^ (2::Int))))
 
-closest :: [Color] -> Color -> Color
-closest [] _ = (0, 0, 0)
-closest (x:xs) y =
-    foldl (\acc f -> if distance f y < distance acc y then f else acc) x xs
+distanceBetweenPixels :: Pixel -> Pixel -> Float
+distanceBetweenPixels p1 p2 = distance (color p1) (color p2)
 
--- initColors :: Int -> [Color]
--- initColors 0 = []
--- initColors n = (0, 0, 0) : initColors (n - 1)
+closest :: [Pixel] -> Pixel -> Pixel
+closest [] _ = Pixel { pos = (0, 0), color = (0, 0, 0) }
+closest (x:xs) y =
+    foldl (\acc f -> 
+        if distanceBetweenPixels f y < distanceBetweenPixels acc y 
+            then f 
+        else acc
+    ) x xs
+
+randomInt :: Int -> IO Int
+randomInt n = getStdRandom (randomR (0, n-1))
