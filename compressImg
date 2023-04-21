@@ -60,7 +60,6 @@ echo "Convergence limit: $2"
 # Display the compression time
 
 # Start the timer
-start=$(date +%s.%N)
 
 for file in ./images/*
 do
@@ -68,16 +67,17 @@ do
     if [[ $file == *.jpg ]] || [[ $file == *.png ]] || [[ $file == *.gif ]] || [[ $file == *.jpeg ]]
     then
         ./convertImg $file > .pixels
+        start=$(date +%s.%N)
         ./imageCompressor -n $1 -l $2 -f .pixels > .compressed
+        end=$(date +%s.%N)
+        echo "Compression time: $(echo "$end - $start" | bc) seconds"
         ./xpmImg .compressed > $file.xpm
     fi
 done
 
 # Stop the timer
-end=$(date +%s.%N)
 
 # Display the time
-echo "Compression time: $(echo "$end - $start" | bc) seconds"
 
 rm .pixels
 rm .compressed
