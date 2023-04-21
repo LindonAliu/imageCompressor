@@ -9,6 +9,7 @@ module Math
     ( closest
     , distance
     , distanceBetweenPixels
+    , distanceSqrBetweenPixels
     , randomInt
     , Pixel (..)
     , Color
@@ -18,14 +19,21 @@ import System.Random
 
 import Types
 
-distance :: Color -> Color -> Float
-distance (x1, y1, z1) (x2, y2, z2) =
-    sqrt (fromIntegral (((x2 - x1) ^ (2::Int)) +
+distanceSqr :: Color -> Color -> Float
+distanceSqr (x1, y1, z1) (x2, y2, z2) =
+    (fromIntegral (((x2 - x1) ^ (2::Int)) +
                         ((y2 - y1) ^ (2::Int)) +
                         ((z2 - z1) ^ (2::Int))))
 
+distance :: Color -> Color -> Float
+distance a b = sqrt $ distanceSqr a b
+
 distanceBetweenPixels :: Pixel -> Pixel -> Float
 distanceBetweenPixels p1 p2 = distance (color p1) (color p2)
+
+distanceSqrBetweenPixels :: Pixel -> Pixel -> Float
+distanceSqrBetweenPixels p1 p2 = distanceSqr (color p1) (color p2)
+
 
 closest :: [Pixel] -> Pixel -> Pixel
 closest [] _ = Pixel { pos = (0, 0), color = (0, 0, 0) }

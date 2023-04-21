@@ -15,6 +15,7 @@ import Data.Maybe
 import System.Random (getStdRandom, randomR)
 
 import Math ( closest
+            , distanceSqrBetweenPixels
             , distanceBetweenPixels
             , randomInt
             )
@@ -59,20 +60,18 @@ computeInitialCentersSecond k centers pixels squaredDistances = do
       let distribution = map (\x -> x / sum squaredDistances) squaredDistances
       newCenterIndex <- sampleFromDistribution distribution
       let newCenter = pixels !! newCenterIndex
-      let newCenters = centers ++ [newCenter]
+      let newCenters = newCenter:centers
       let remaining = delete newCenter pixels
-      let newDistances = map (distanceBetweenPixels newCenter) remaining
-      let newSquaredDistances = map (^ 2) newDistances
-      chooseInitialCentersSecond k newCenters remaining newSquaredDistances
+      let newDistances = map (distanceSqrBetweenPixels newCenter) remaining
+      chooseInitialCentersSecond k newCenters remaining newDistances
 
 chooseInitialCenters :: Int -> [Pixel] -> IO [Pixel]
 chooseInitialCenters k pixels = do
   firstCenter <- getRandomPixelInList pixels
   let initialCenters = [firstCenter]
   let remainingPixels = delete firstCenter pixels
-  let distances = map (distanceBetweenPixels firstCenter) remainingPixels
-  let squaredDistances = map (^ (2::Int)) distances
-  chooseInitialCentersSecond k initialCenters remainingPixels squaredDistances
+  let distances = map (distanceSqrBetweenPixels firstCenter) remainingPixels
+  chooseInitialCentersSecond k initialCenters remainingPixels distances
 
 assignPixelsToCenters :: [Pixel] -> [Pixel] -> [(Pixel, [Pixel])]
 assignPixelsToCenters pixels centers = map assignCenter centers
