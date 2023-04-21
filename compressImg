@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# This script will compress all images in /images folder with imageCompressor binary
+
+# Take two arguments: the first one is the number of colors to use in the compression, the second one is the convergence limit
+
+# Check if there is two arguments
+if [ $# -ne 2 ]; then
+    echo "Usage: ./compressImg [number of colors] [convergence limit]"
+    exit 84
+fi
+
+# Check if the first argument is a number
+if ! [[ $1 =~ ^[0-9]+$ ]]; then
+    echo "First argument must be a number"
+    exit 84
+fi
+
+# Check if the second argument is a number
+if ! [[ $2 =~ ^[0-9]+$ ]]; then
+    echo "Second argument must be a number"
+    exit 84
+fi
+
+# if imageCompressor binary doesn't exist, return an error =
+if [ ! -f "./imageCompressor" ]; then
+    echo "imageCompressor binary doesn't exist"
+    exit 84
+fi
+
+# if compressImg binary doesn't exist, return an error
+if [ ! -f "./compressImg" ]; then
+    echo "compressImg binary doesn't exist"
+    exit 84
+fi
+
+# if convertImg binary doesn't exist, return an error
+if [ ! -f "./convertImg" ]; then
+    echo "convertImg binary doesn't exist"
+    exit 84
+fi
+
+# Get all images in /images folder
+
+# If there is no images, return an error
+if [ ! "$(ls -A ./images)" ]; then
+    echo "No images in /images folder"
+    exit 84
+fi
+
+# Display the number of images to compress if there is images
+echo "Number of images to compress: $(ls ./images | wc -l)"
+
+# Display the number of colors and the convergence limit
+echo "Number of colors: $1"
+echo "Convergence limit: $2"
+
+# Display the compression ratio
+
+# Display the compression time
+
+# Start the timer
+start=$(date +%s.%N)
+
+for file in ./images/*
+do
+    # Check if file is an image
+    if [[ $file == *.jpg ]] || [[ $file == *.png ]] || [[ $file == *.gif ]] || [[ $file == *.jpeg ]]
+    then
+        ./convertImg $file > .pixels
+        ./imageCompressor -n $1 -l $2 -f .pixels > .compressed
+        ./xpmImg .compressed > $file.xpm
+    fi
+done
+
+# Stop the timer
+end=$(date +%s.%N)
+
+# Display the time
+echo "Compression time: $(echo "$end - $start" | bc) seconds"
+
+rm .pixels
+rm .compressed
